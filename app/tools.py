@@ -236,6 +236,10 @@ class RepoTools:
             header += f". More remains: call read_file with start_line={end + 1}"
         return header + "\n" + "\n".join(numbered)
 
+    def file_url(self, path: str) -> str:
+        """Link to a file on github.com, so answers can cite their sources."""
+        return f"https://github.com/{self.owner}/{self.repo}/blob/{self._branch()}/{path}"
+
     # ---------- helpers (cached so we don't re-download per tool call) ----------
 
     def _repo_info(self) -> dict:

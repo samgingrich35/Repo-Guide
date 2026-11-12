@@ -12,7 +12,23 @@ python -m venv .venv
 uvicorn app.main:app --reload
 ```
 
-Then open http://localhost:8000/health.
+Then open http://localhost:8000/docs to try the API.
+
+### Setup: your API key
+Copy `.env.example` to `.env` and paste your key from https://console.anthropic.com/settings/keys
+after `ANTHROPIC_API_KEY=`. `.env` is git-ignored, so your key never reaches GitHub.
+
+### Chat from the terminal
+```bash
+python -m app.cli https://github.com/pallets/flask
+```
+
+### API
+| Method | Path | What it does |
+|---|---|---|
+| `POST` | `/api/sessions` | `{"repo_url": "..."}` → starts a chat and returns an automatic overview |
+| `POST` | `/api/sessions/{id}/messages` | `{"message": "..."}` → asks a follow-up question |
+| `GET` | `/health` | Liveness check |
 
 ## Checks
 
