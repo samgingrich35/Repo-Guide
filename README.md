@@ -1,5 +1,7 @@
 # Repo Guide
 
+[![CI](https://github.com/samgingrich35/Repo-Guide/actions/workflows/ci.yml/badge.svg)](https://github.com/samgingrich35/Repo-Guide/actions/workflows/ci.yml)
+
 An AI agent that explores any public GitHub repository and answers questions about it, citing the files it read. Built with the Claude API and developed using Claude Code.
 
 > 🚧 Work in progress. See [ROADMAP.md](ROADMAP.md) for the build plan and current status.
