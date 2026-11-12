@@ -9,6 +9,18 @@ _(Free hosting: the first visit after a quiet spell takes ~30–60 s to wake up.
 
 See [ROADMAP.md](ROADMAP.md) for how it was built, step by step.
 
+## How changes reach production
+
+```
+git push ─▶ CI (lint · 68 tests · 80%+ coverage · Docker build + smoke test)
+              │ only if green
+              ▼
+           Deploy: build image ─▶ ghcr.io/samgingrich35/repo-guide ─▶ Render deploy hook
+                                                                        │
+                                                                        ▼
+                                              live site  (/health shows the running commit)
+```
+
 ## Run locally
 
 ```bash
