@@ -6,10 +6,13 @@ API docs (auto-generated): http://localhost:8000/docs
 
 import logging
 from functools import lru_cache
+from pathlib import Path
 from typing import Annotated
 
 import anthropic
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
 from app import __doc__ as app_description
@@ -28,6 +31,9 @@ from app.tools import RepoNotFoundError, RepoTools, ToolError, parse_repo_url
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
 app = FastAPI(title="Repo Guide", description=app_description, version="0.1.0")
+
+STATIC_DIR = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
 
 # ---------- request / response shapes ----------
@@ -96,6 +102,12 @@ StoreDep = Annotated[SessionStore, Depends(get_store)]
 
 
 # ---------- routes ----------
+
+
+@app.get("/", include_in_schema=False)
+def home() -> FileResponse:
+    """The web page: paste a repo URL, read the overview, then chat."""
+    return FileResponse(STATIC_DIR / "index.html")
 
 
 @app.get("/health")

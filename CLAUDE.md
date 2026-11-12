@@ -8,8 +8,11 @@ Repo Guide: a web app where a user pastes a public GitHub repo URL, gets an auto
 ## Layout
 - `app/main.py`: FastAPI routes
 - `app/config.py`: settings from env vars / `.env` (never hardcode secrets)
-- `app/tools.py`: GitHub tools the agent can call (Step 2)
-- `app/agent.py`: the Claude tool-use loop (Step 3)
+- `app/tools.py`: GitHub tools the agent can call
+- `app/agent.py`: the Claude tool-use loop
+- `app/sessions.py`: in-memory chat sessions + the overview prompt
+- `app/static/`: the web page (plain HTML/CSS/JS, no build step)
+- `app/cli.py`: terminal chat (`python -m app.cli <repo-url>`)
 - `tests/`: pytest. Claude and GitHub are always mocked, so tests are free and offline.
 
 ## Commands

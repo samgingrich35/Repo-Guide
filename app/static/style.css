@@ -1,0 +1,207 @@
+/* Colors live in variables so light and dark mode are one swap. */
+:root {
+  --bg: #fafaf9;
+  --surface: #ffffff;
+  --text: #1c1917;
+  --muted: #6b6560;
+  --border: #e7e5e4;
+  --accent: #c2410c;
+  --accent-text: #ffffff;
+  --accent-soft: #fff1e8;
+  --code-bg: #f5f5f4;
+  --error: #b91c1c;
+  --radius: 12px;
+  --mono: ui-monospace, "Cascadia Code", "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #141210;
+    --surface: #1c1a17;
+    --text: #f5f5f4;
+    --muted: #a8a29e;
+    --border: #2e2b27;
+    --accent: #f97316;
+    --accent-text: #1c1917;
+    --accent-soft: #2a1c12;
+    --code-bg: #24211d;
+    --error: #f87171;
+    color-scheme: dark;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main { flex: 1; width: 100%; max-width: 820px; margin: 0 auto; padding: 0 16px; }
+
+a { color: var(--accent); }
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  border-radius: 10px;
+  background: var(--accent);
+  color: var(--accent-text);
+  padding: 0 20px;
+  font-weight: 600;
+}
+button:disabled { opacity: 0.5; cursor: progress; }
+
+input, textarea {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+input:focus, textarea:focus, button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* ---------- header / footer ---------- */
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.brand { display: flex; gap: 8px; align-items: center; font-weight: 700; color: var(--text); text-decoration: none; }
+.logo { color: var(--accent); }
+.top-link { color: var(--muted); text-decoration: none; font-size: 14px; }
+.foot { text-align: center; color: var(--muted); font-size: 13px; padding: 24px 16px; }
+
+/* ---------- landing ---------- */
+
+.hero { padding: 72px 0 24px; text-align: center; }
+.hero h1 { font-size: clamp(28px, 5vw, 42px); line-height: 1.15; margin: 0 0 12px; letter-spacing: -0.02em; }
+.sub { color: var(--muted); max-width: 580px; margin: 0 auto 28px; }
+
+.url-form { display: flex; gap: 8px; max-width: 600px; margin: 0 auto; }
+.url-form input { flex: 1; }
+.url-form button { height: 48px; }
+
+.examples { color: var(--muted); font-size: 14px; margin-top: 14px; }
+.chip {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-weight: 500;
+  font-size: 14px;
+  margin: 4px 2px;
+}
+.chip:hover { border-color: var(--accent); }
+
+.error { color: var(--error); margin-top: 16px; }
+
+/* ---------- chat ---------- */
+
+.repo-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  color: var(--muted);
+  font-size: 14px;
+  border-bottom: 1px solid var(--border);
+}
+.repo-bar a { font-weight: 600; }
+.link-btn { background: none; color: var(--accent); padding: 0; font-weight: 500; }
+
+.thread { display: flex; flex-direction: column; gap: 20px; padding: 24px 0 140px; }
+
+.msg.user { align-self: flex-end; max-width: 85%; }
+.msg.user .bubble {
+  background: var(--accent-soft);
+  border-radius: var(--radius) var(--radius) 4px var(--radius);
+  padding: 10px 14px;
+  white-space: pre-wrap;
+}
+
+.msg.agent {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+.msg.agent.error-msg { border-color: var(--error); color: var(--error); }
+
+.working { display: flex; align-items: center; gap: 12px; color: var(--muted); }
+.spinner {
+  width: 16px; height: 16px; flex: none;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Markdown answers */
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md h2 { font-size: 18px; margin: 22px 0 8px; }
+.md h3 { font-size: 16px; margin: 18px 0 6px; }
+.md ul, .md ol { padding-left: 22px; }
+.md code { font-family: var(--mono); font-size: 0.88em; background: var(--code-bg); padding: 1px 5px; border-radius: 5px; }
+.md pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+.md pre code { background: none; padding: 0; }
+.md table { border-collapse: collapse; display: block; overflow-x: auto; }
+.md th, .md td { border: 1px solid var(--border); padding: 4px 10px; }
+
+/* Sources + trace */
+.sources { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 14px; }
+.sources .label { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.sources ul { list-style: none; padding: 0; margin: 6px 0 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.sources a {
+  font-family: var(--mono); font-size: 13px; text-decoration: none;
+  background: var(--code-bg); border-radius: 6px; padding: 2px 8px; display: inline-block;
+}
+
+.trace { margin-top: 12px; font-size: 14px; color: var(--muted); }
+.trace summary { cursor: pointer; }
+.steps { margin: 8px 0 0; padding-left: 22px; font-family: var(--mono); font-size: 13px; }
+.steps .err { color: var(--error); }
+
+/* Question box pinned to the bottom */
+.ask-form {
+  position: fixed;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+  width: min(820px - 32px, calc(100% - 32px));
+  display: flex;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 8px;
+  box-shadow: 0 8px 30px rgb(0 0 0 / 0.08);
+}
+.ask-form textarea { flex: 1; border: none; resize: none; max-height: 160px; padding: 8px 10px; }
+.ask-form textarea:focus { outline: none; }
+.ask-form button { align-self: flex-end; height: 40px; }
+
+@media (max-width: 520px) {
+  .hero { padding-top: 40px; }
+  .url-form { flex-direction: column; }
+  .msg.user { max-width: 100%; }
+  .msg.agent { padding: 14px; }
+}

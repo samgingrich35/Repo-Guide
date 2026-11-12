@@ -12,7 +12,7 @@ python -m venv .venv
 uvicorn app.main:app --reload
 ```
 
-Then open http://localhost:8000/docs to try the API.
+Then open http://localhost:8000 for the web app, or http://localhost:8000/docs to try the API.
 
 ### Setup: your API key
 Copy `.env.example` to `.env` and paste your key from https://console.anthropic.com/settings/keys

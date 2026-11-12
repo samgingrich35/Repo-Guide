@@ -17,7 +17,7 @@ This is the plain-English map of how the project gets built. Each step ends with
 | 2 | Tools (the agent's "hands") | 4 functions that fetch from GitHub: repo info, file list, search, read file | Tests pass, and a real repo's files print out | ✅ |
 | 3 | Agent loop (the "brain") | Ask Claude "which tool next?" → run it → send result back → repeat → answer | Tests pass with a fake Claude (no API cost) | ✅ |
 | 4 | Overview + chat | Auto-describe the repo, then follow-up questions with memory | Ask about a real repo from the command line | ✅ |
-| 5 | Web page | URL box, overview, chat, and a "files it read" panel | Use it in the browser | ⬜ |
+| 5 | Web page | URL box, overview, chat, and a "files it read" panel | Use it in the browser | ✅ |
 | 6 | Safety + quality | Step limit, rate limit, cost tracking, lint + tests | `ruff` and `pytest` all green | ⬜ |
 | 7 | Docker | Put the app in a "box" that runs the same anywhere | `docker run` works locally | ⬜ |
 | 8 | CI/CD | GitHub tests every change and deploys when tests pass | Green checkmark on GitHub | ⬜ |

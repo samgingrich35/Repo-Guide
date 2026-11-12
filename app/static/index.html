@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repo Guide</title>
+  <meta name="description" content="Paste a GitHub repo and an AI agent explores it and explains it to you.">
+  <link rel="stylesheet" href="/static/style.css">
+  <!-- Answers are Markdown: marked turns them into HTML, DOMPurify strips anything unsafe. -->
+  <script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+</head>
+<body>
+  <header class="top">
+    <a class="brand" href="/">
+      <span class="logo" aria-hidden="true">◆</span>
+      <span>Repo Guide</span>
+    </a>
+    <a class="top-link" href="/docs" target="_blank" rel="noopener">API</a>
+  </header>
+
+  <main>
+    <section class="hero" id="hero">
+      <h1>Understand any GitHub repo in a minute</h1>
+      <p class="sub">Paste a public repository. An AI agent explores the code with its own tools,
+        explains how it's organized, and answers your questions, citing the files it read.</p>
+
+      <form id="start-form" class="url-form" autocomplete="off">
+        <input id="repo-url" type="text" inputmode="url" required
+               placeholder="https://github.com/owner/repo" aria-label="GitHub repository URL">
+        <button type="submit" id="start-btn">Explore</button>
+      </form>
+      <p class="examples">
+        Try
+        <button type="button" class="chip" data-url="https://github.com/psf/requests">psf/requests</button>
+        <button type="button" class="chip" data-url="https://github.com/pallets/flask">pallets/flask</button>
+        <button type="button" class="chip" data-url="https://github.com/fastapi/fastapi">fastapi/fastapi</button>
+      </p>
+      <p class="error" id="start-error" role="alert" hidden></p>
+    </section>
+
+    <section id="chat" class="chat" hidden>
+      <div class="repo-bar">
+        <span>Exploring <a id="repo-name" target="_blank" rel="noopener"></a></span>
+        <button type="button" class="link-btn" id="new-btn">New repo</button>
+      </div>
+      <div id="thread" class="thread" aria-live="polite"></div>
+      <form id="ask-form" class="ask-form" autocomplete="off">
+        <textarea id="question" rows="1" maxlength="2000" required
+                  placeholder="Ask anything about this repo…" aria-label="Your question"></textarea>
+        <button type="submit" id="ask-btn">Ask</button>
+      </form>
+    </section>
+  </main>
+
+  <footer class="foot">
+    Built with the Claude API · The agent can only read public repos and never runs their code.
+  </footer>
+
+  <template id="tpl-user"><div class="msg user"><div class="bubble"></div></div></template>
+  <template id="tpl-agent">
+    <article class="msg agent">
+      <div class="answer md"></div>
+      <div class="sources" hidden><span class="label">Sources</span><ul></ul></div>
+      <details class="trace">
+        <summary></summary>
+        <ol class="steps"></ol>
+      </details>
+    </article>
+  </template>
+  <template id="tpl-working">
+    <div class="msg agent working">
+      <span class="spinner" aria-hidden="true"></span>
+      <span class="status"></span>
+    </div>
+  </template>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
