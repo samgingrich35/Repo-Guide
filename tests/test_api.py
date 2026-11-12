@@ -7,7 +7,8 @@ from fastapi.testclient import TestClient
 
 from app.agent import RepoAgent
 from app.config import Settings
-from app.main import app, get_store
+from app.limits import DailyBudget, RateLimiter
+from app.main import Guards, app, get_guards, get_store
 from app.sessions import SessionBusyError, SessionStore
 from app.tools import RepoTools
 from tests.test_agent import FakeClaude, reply, text, tool_use
@@ -27,14 +28,24 @@ def make_store(claude: FakeClaude, **kwargs) -> SessionStore:
     return SessionStore(factory, **kwargs)
 
 
+def make_guards(new_chats=100, messages=100, budget_usd=100.0) -> Guards:
+    return Guards(
+        new_chats=RateLimiter(new_chats, 3600),
+        messages=RateLimiter(messages, 3600),
+        budget=DailyBudget(budget_usd),
+    )
+
+
 @pytest.fixture
 def api():
     """Returns a function that builds a test client around a scripted Claude."""
 
-    def build(*replies, **store_kwargs):
+    def build(*replies, guards=None, **store_kwargs):
         claude = FakeClaude(*replies)
         store = make_store(claude, **store_kwargs)
+        guards = guards or make_guards()
         app.dependency_overrides[get_store] = lambda: store
+        app.dependency_overrides[get_guards] = lambda: guards
         return TestClient(app), claude, store
 
     yield build
@@ -168,3 +179,46 @@ def test_store_refuses_a_second_question_while_one_is_running():
     session.lock.acquire()  # pretend a question is in progress
     with pytest.raises(SessionBusyError):
         store.ask(session, "another one")
+
+
+# ---------- abuse & cost protection ----------
+
+
+def test_new_chats_are_rate_limited_per_visitor(api):
+    client, claude, _ = api(reply(text("one")), reply(text("two")), guards=make_guards(new_chats=1))
+    assert client.post("/api/sessions", json={"repo_url": REPO_URL}).status_code == 201
+
+    resp = client.post("/api/sessions", json={"repo_url": REPO_URL})
+    assert resp.status_code == 429
+    assert int(resp.headers["Retry-After"]) > 0
+    assert len(claude.requests) == 1  # the blocked request never reached Claude
+
+
+def test_messages_are_rate_limited_per_visitor(api):
+    client, _, _ = api(reply(text("Overview.")), reply(text("a1")), guards=make_guards(messages=1))
+    session_id = client.post("/api/sessions", json={"repo_url": REPO_URL}).json()["session_id"]
+    url = f"/api/sessions/{session_id}/messages"
+    assert client.post(url, json={"message": "q1"}).status_code == 200
+    assert client.post(url, json={"message": "q2"}).status_code == 429
+
+
+def test_daily_budget_stops_spending_once_used_up(api):
+    guards = make_guards(budget_usd=0.00001)
+    client, claude, _ = api(reply(text("Overview."), tokens_in=500_000), guards=guards)
+    assert client.post("/api/sessions", json={"repo_url": REPO_URL}).status_code == 201
+    assert guards.budget.spent_usd > 0.00001
+
+    resp = client.post("/api/sessions", json={"repo_url": REPO_URL})
+    assert resp.status_code == 503
+    assert "budget" in resp.json()["detail"]
+    assert len(claude.requests) == 1
+
+
+def test_security_headers_are_set(api):
+    client, _, _ = api()
+    page = client.get("/")
+    assert "script-src 'self' https://cdn.jsdelivr.net" in page.headers["Content-Security-Policy"]
+    assert page.headers["X-Content-Type-Options"] == "nosniff"
+    assert page.headers["X-Frame-Options"] == "DENY"
+    # The API docs page uses inline scripts, so it must not get the strict policy.
+    assert "Content-Security-Policy" not in client.get("/docs").headers

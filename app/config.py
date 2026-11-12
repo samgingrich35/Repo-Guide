@@ -18,6 +18,11 @@ class Settings(BaseSettings):
     max_agent_steps: int = 10
     effort: str = "medium"  # low | medium | high: how hard Claude thinks
 
+    # Abuse / cost protection for the public demo
+    new_chats_per_hour: int = 10  # per visitor (IP address)
+    messages_per_hour: int = 60  # per visitor
+    daily_budget_usd: float = 1.00  # whole server; 0 turns the cap off
+
 
 @lru_cache
 def get_settings() -> Settings:

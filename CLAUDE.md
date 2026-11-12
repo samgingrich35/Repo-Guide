@@ -11,6 +11,7 @@ Repo Guide: a web app where a user pastes a public GitHub repo URL, gets an auto
 - `app/tools.py`: GitHub tools the agent can call
 - `app/agent.py`: the Claude tool-use loop
 - `app/sessions.py`: in-memory chat sessions + the overview prompt
+- `app/limits.py`: per-visitor rate limits + daily Claude budget cap
 - `app/static/`: the web page (plain HTML/CSS/JS, no build step)
 - `app/cli.py`: terminal chat (`python -m app.cli <repo-url>`)
 - `tests/`: pytest. Claude and GitHub are always mocked, so tests are free and offline.
@@ -19,7 +20,7 @@ Repo Guide: a web app where a user pastes a public GitHub repo URL, gets an auto
 - Install: `python -m venv .venv` then `.venv/Scripts/pip install -e ".[dev]"` (Windows) or `.venv/bin/pip ...`
 - Run: `uvicorn app.main:app --reload` → http://localhost:8000
 - Lint: `ruff check . && ruff format --check .`
-- Test: `pytest -v`
+- Test: `pytest -v` (CI also enforces 80%+ coverage: `pytest --cov=app`)
 
 ## Working rules
 - Run lint and tests before every commit; CI runs the same checks.
