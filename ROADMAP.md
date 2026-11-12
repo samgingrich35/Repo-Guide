@@ -21,7 +21,7 @@ This is the plain-English map of how the project gets built. Each step ends with
 | 6 | Safety + quality | Step limit, rate limit, cost tracking, lint + tests | `ruff` and `pytest` all green | ✅ |
 | 7 | Docker | Put the app in a "box" that runs the same anywhere | Container builds and passes smoke tests | ✅ (in CI) |
 | 8 | CI/CD | GitHub tests every change and deploys when tests pass | Green checkmark on GitHub | ✅ |
-| 9 | Go live | Host it on Render with a public link | Public URL works | ⬜ |
+| 9 | Go live | Host it on Render with a public link | Public URL works | ✅ [live](https://repo-guide-ippc.onrender.com) |
 | 10 | Show it off | README, diagram, demo GIF, "how I built it with Claude Code" | Repo looks professional | ⬜ |
 
 **Where you need to act:** Step 4 (Anthropic API key), Step 7 (install Docker Desktop), Steps 8–9 (create the GitHub repo + Render account).

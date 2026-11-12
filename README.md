@@ -4,7 +4,10 @@
 
 An AI agent that explores any public GitHub repository and answers questions about it, citing the files it read. Built with the Claude API and developed using Claude Code.
 
-> 🚧 Work in progress. See [ROADMAP.md](ROADMAP.md) for the build plan and current status.
+**Live demo: https://repo-guide-ippc.onrender.com**  
+_(Free hosting: the first visit after a quiet spell takes ~30–60 s to wake up.)_
+
+See [ROADMAP.md](ROADMAP.md) for how it was built, step by step.
 
 ## Run locally
 
