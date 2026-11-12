@@ -24,7 +24,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           # Deploy exactly the commit CI tested, not whatever main is now.
           ref: ${{ github.event.workflow_run.head_sha || github.sha }}
@@ -49,9 +49,19 @@ jobs:
         env:
           HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
         run: |
+          # Forgive stray spaces, line breaks or quotes picked up when pasting the secret.
+          HOOK=$(printf '%s' "$HOOK" | tr -d "[:space:]\"'")
           if [ -z "$HOOK" ]; then
             echo "::notice::RENDER_DEPLOY_HOOK_URL secret not set yet; skipping deploy (image was still published)."
             exit 0
           fi
+          case "$HOOK" in
+            https://api.render.com/deploy/*) ;;
+            *)
+              # Never print the secret itself; just say what shape it should have.
+              echo "::error::RENDER_DEPLOY_HOOK_URL doesn't look like a Render deploy hook. It should start with https://api.render.com/deploy/ (Render > your service > Settings > Deploy Hook)."
+              exit 1
+              ;;
+          esac
           curl -fsS -X POST "$HOOK" > /dev/null
           echo "Render deploy triggered."
