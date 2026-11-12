@@ -1,0 +1,57 @@
+# CD = Continuous Delivery.
+# Runs only after CI passes on main: builds the container image, publishes it
+# to GitHub Container Registry (ghcr.io), then tells the host to redeploy.
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch: # also allow a manual "Run workflow" button
+
+permissions:
+  contents: read
+  packages: write # needed to push the image to ghcr.io
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false # never interrupt a deploy halfway
+
+jobs:
+  deploy:
+    # Only deploy code that passed CI.
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Deploy exactly the commit CI tested, not whatever main is now.
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+
+      - name: Image name
+        id: image
+        # ghcr.io requires lowercase names.
+        run: echo "name=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GitHub Container Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Build and push image
+        env:
+          IMAGE: ${{ steps.image.outputs.name }}
+          SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
+        run: |
+          docker build -t "$IMAGE:latest" -t "$IMAGE:${SHA::7}" .
+          docker push --all-tags "$IMAGE"
+
+      - name: Trigger Render deploy
+        env:
+          HOOK: ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "::notice::RENDER_DEPLOY_HOOK_URL secret not set yet; skipping deploy (image was still published)."
+            exit 0
+          fi
+          curl -fsS -X POST "$HOOK" > /dev/null
+          echo "Render deploy triggered."
