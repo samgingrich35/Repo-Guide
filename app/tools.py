@@ -9,10 +9,14 @@ blow up the conversation (or the bill).
 
 import re
 from dataclasses import dataclass, field
+from urllib.parse import quote
 
 import httpx
 
 GITHUB_API = "https://api.github.com"
+# File contents come from here instead of the API: it doesn't count against
+# GitHub's API rate limit (only 60 requests/hour without a token).
+GITHUB_RAW = "https://raw.githubusercontent.com"
 
 MAX_FILE_BYTES = 200_000  # refuse to read files bigger than this
 MAX_LINES_PER_READ = 400  # Claude can ask for more with start_line
@@ -216,9 +220,7 @@ class RepoTools:
             raise ToolError(f"'{path}' is {_human_size(entry['size'])}, too large to read.")
 
         resp = self.http.get(
-            f"/repos/{self.owner}/{self.repo}/contents/{path}",
-            params={"ref": self._branch()},
-            headers={"Accept": "application/vnd.github.raw"},
+            f"{GITHUB_RAW}/{self.owner}/{self.repo}/{quote(self._branch())}/{quote(path)}"
         )
         _raise_for_github(resp)
         if b"\x00" in resp.content[:8000]:

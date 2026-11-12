@@ -29,21 +29,27 @@ TREE = {
 }
 
 
+requested_raw: list[str] = []  # raw-file paths the fake GitHub was asked for
+
+
 def fake_github(file_bytes: bytes = b"print('hi')\n") -> httpx.Client:
     """A stand-in for GitHub: knows one repo, a small file tree, and a few files."""
 
     def handler(request: httpx.Request) -> httpx.Response:
         path = request.url.path
+        if request.url.host == "raw.githubusercontent.com":
+            requested_raw.append(path)
+            if path == "/octo/demo/main/app/main.py":
+                return httpx.Response(200, content=file_bytes)
+            if path == "/octo/demo/main/assets/logo.png":
+                return httpx.Response(200, content=b"\x89PNG\x00\x00binary")
+            return httpx.Response(404)
         if path == "/repos/octo/demo":
             return httpx.Response(200, json=REPO_INFO)
         if path == "/repos/octo/missing":
             return httpx.Response(404, json={"message": "Not Found"})
         if path == "/repos/octo/demo/git/trees/main":
             return httpx.Response(200, json=TREE)
-        if path == "/repos/octo/demo/contents/app/main.py":
-            return httpx.Response(200, content=file_bytes)
-        if path == "/repos/octo/demo/contents/assets/logo.png":
-            return httpx.Response(200, content=b"\x89PNG\x00\x00binary")
         return httpx.Response(404, json={"message": "Not Found"})
 
     return httpx.Client(base_url=GITHUB_API, transport=httpx.MockTransport(handler), headers={})
@@ -214,3 +220,9 @@ def test_tool_definitions_have_names_and_schemas():
     for tool in TOOL_DEFINITIONS:
         assert tool["description"]
         assert tool["input_schema"]["type"] == "object"
+
+
+def test_read_file_uses_raw_host_not_the_rate_limited_api():
+    requested_raw.clear()
+    make_tools().read_file("app/main.py")
+    assert requested_raw == ["/octo/demo/main/app/main.py"]
