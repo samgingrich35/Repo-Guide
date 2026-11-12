@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     claude_model: str = "claude-haiku-5-5"
     github_token: str = ""
     max_agent_steps: int = 10
+    effort: str = "medium"  # low | medium | high: how hard Claude thinks
 
 
 @lru_cache

@@ -15,7 +15,7 @@ This is the plain-English map of how the project gets built. Each step ends with
 | 0 | Setup | Make the project folder, install Python tools, start git | Folder exists, `git status` works | ✅ |
 | 1 | Skeleton app | A tiny web server that just says "I'm alive" | `localhost:8000/health` → `{"status":"ok"}` | ✅ |
 | 2 | Tools (the agent's "hands") | 4 functions that fetch from GitHub: repo info, file list, search, read file | Tests pass, and a real repo's files print out | ✅ |
-| 3 | Agent loop (the "brain") | Ask Claude "which tool next?" → run it → send result back → repeat → answer | Tests pass with a fake Claude (no API cost) | ⬜ |
+| 3 | Agent loop (the "brain") | Ask Claude "which tool next?" → run it → send result back → repeat → answer | Tests pass with a fake Claude (no API cost) | ✅ |
 | 4 | Overview + chat | Auto-describe the repo, then follow-up questions with memory | Ask about a real repo from the command line | ⬜ |
 | 5 | Web page | URL box, overview, chat, and a "files it read" panel | Use it in the browser | ⬜ |
 | 6 | Safety + quality | Step limit, rate limit, cost tracking, lint + tests | `ruff` and `pytest` all green | ⬜ |
