@@ -31,6 +31,10 @@ USER appuser
 
 EXPOSE 8000
 
+# Which commit this image was built from; shown at /health.
+ARG GIT_SHA=dev
+ENV GIT_SHA=$GIT_SHA
+
 # Lets Docker (and hosts that read it) know when the app is actually ready.
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:' + __import__('os').environ.get('PORT', '8000') + '/health')"

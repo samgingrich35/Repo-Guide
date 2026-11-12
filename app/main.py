@@ -5,6 +5,7 @@ API docs (auto-generated): http://localhost:8000/docs
 """
 
 import logging
+import os
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
@@ -167,8 +168,9 @@ def home() -> FileResponse:
 
 @app.get("/health")
 def health() -> dict[str, str]:
-    """Used by hosting platforms (and us) to check the server is up."""
-    return {"status": "ok"}
+    """Used by hosting platforms (and us) to check the server is up, and which
+    commit it's running (baked into the image at build time)."""
+    return {"status": "ok", "version": os.environ.get("GIT_SHA", "dev")}
 
 
 @app.post("/api/sessions", status_code=201)

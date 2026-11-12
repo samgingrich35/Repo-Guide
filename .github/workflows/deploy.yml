@@ -42,7 +42,7 @@ jobs:
           IMAGE: ${{ steps.image.outputs.name }}
           SHA: ${{ github.event.workflow_run.head_sha || github.sha }}
         run: |
-          docker build -t "$IMAGE:latest" -t "$IMAGE:${SHA::7}" .
+          docker build --build-arg GIT_SHA="${SHA::7}" -t "$IMAGE:latest" -t "$IMAGE:${SHA::7}" .
           docker push --all-tags "$IMAGE"
 
       - name: Trigger Render deploy
