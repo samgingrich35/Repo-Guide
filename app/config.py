@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     anthropic_api_key: str = ""
-    claude_model: str = "claude-opus-5-5"
+    claude_model: str = "claude-haiku-5-5"
     github_token: str = ""
     max_agent_steps: int = 10
 
