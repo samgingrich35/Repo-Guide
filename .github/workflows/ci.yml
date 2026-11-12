@@ -27,3 +27,35 @@ jobs:
 
       - name: Test
         run: pytest -v --cov=app --cov-report=term-missing --cov-fail-under=80
+
+  # Build the real container and prove it starts and serves the page.
+  docker:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: docker build -t repo-guide .
+
+      - name: Start container
+        run: docker run -d --name app -p 8000:8000 repo-guide
+
+      - name: Smoke test
+        run: |
+          for i in $(seq 1 30); do
+            curl -fs http://localhost:8000/health && break
+            sleep 1
+          done
+          curl -fs http://localhost:8000/health | grep -q '"ok"'
+          curl -fs http://localhost:8000/ | grep -q "Repo Guide"
+          # Without an API key the app must explain itself, not crash.
+          code=$(curl -s -o /dev/null -w "%{http_code}" -X POST http://localhost:8000/api/sessions \
+            -H "content-type: application/json" -d '{"repo_url":"https://github.com/psf/requests"}')
+          test "$code" = "503"
+          # The container must not run as root.
+          test "$(docker exec app whoami)" = "appuser"
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker logs app

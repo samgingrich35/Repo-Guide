@@ -1,0 +1,15 @@
+# Keep the image small, and NEVER ship secrets into it.
+.env
+.venv/
+.git/
+.github/
+.claude/
+tests/
+**/__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/

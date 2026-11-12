@@ -30,6 +30,15 @@ python -m app.cli https://github.com/pallets/flask
 | `POST` | `/api/sessions/{id}/messages` | `{"message": "..."}` → asks a follow-up question |
 | `GET` | `/health` | Liveness check |
 
+## Run with Docker
+
+```bash
+docker build -t repo-guide .
+docker run --rm -p 8000:8000 --env-file .env repo-guide
+```
+
+The image runs as a non-root user, has a built-in health check, and reads the port from `$PORT` so it works on hosting platforms unchanged. `.env` is excluded from the image, so secrets are passed in at run time only.
+
 ## Checks
 
 ```bash

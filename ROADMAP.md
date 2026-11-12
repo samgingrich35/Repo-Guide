@@ -19,7 +19,7 @@ This is the plain-English map of how the project gets built. Each step ends with
 | 4 | Overview + chat | Auto-describe the repo, then follow-up questions with memory | Ask about a real repo from the command line | ✅ |
 | 5 | Web page | URL box, overview, chat, and a "files it read" panel | Use it in the browser | ✅ |
 | 6 | Safety + quality | Step limit, rate limit, cost tracking, lint + tests | `ruff` and `pytest` all green | ✅ |
-| 7 | Docker | Put the app in a "box" that runs the same anywhere | `docker run` works locally | ⬜ |
+| 7 | Docker | Put the app in a "box" that runs the same anywhere | `docker run` works locally | 🟡 Dockerfile done, CI builds and smoke-tests it; local run needs Docker Desktop |
 | 8 | CI/CD | GitHub tests every change and deploys when tests pass | Green checkmark on GitHub | ⬜ |
 | 9 | Go live | Host it on Render with a public link | Public URL works | ⬜ |
 | 10 | Show it off | README, diagram, demo GIF, "how I built it with Claude Code" | Repo looks professional | ⬜ |
